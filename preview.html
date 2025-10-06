@@ -14,7 +14,7 @@
       overflow: hidden;
     }
 
-    /* Scrollbar styling (WebKit) */
+    /* Scrollbar Styling */
     ::-webkit-scrollbar {
       height: 12px;
     }
@@ -26,71 +26,55 @@
       border-radius: 4px;
     }
 
-    /* Firefox scrollbar */
     * {
       scrollbar-width: thin;
       scrollbar-color: #333 #808080;
     }
 
-    /* Layout Sections */
+    /* Layout Structure */
     .layout {
-      display: grid;
-      grid-template-rows: auto 1fr auto;
+      display: flex;
+      flex-direction: column;
       height: 100vh;
     }
 
-    .header, .main, .footer {
+    .main {
+      flex-grow: 1;
       overflow: hidden;
     }
 
-    .header .tile-container,
-    .main .tile-container,
-    .footer .tile-container {
+    .scrollbar {
+      height: 14px;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+
+    .tiles-wrapper {
       display: flex;
       flex-direction: row;
+      align-items: flex-start;
       white-space: nowrap;
+      height: 100%;
     }
 
-    /* --- HEADER --- */
-    .header .tile {
+    .tile {
       text-align: right;
+      color: white;
+      margin: 0;
+      padding: 0;
     }
 
-    .header .tile div {
+    .tile div {
       font-size: 10px;
       background-color: #808080;
       padding: 2px 4px;
-      height: 100%;
     }
 
-    /* --- MAIN --- */
-    .main {
-      overflow: hidden;
-    }
-
-    .main .tile-scroll {
-      overflow-x: hidden;
-    }
-
-    .main .tile img {
+    .tile img {
       display: block;
-      height: 100%;
+      height: calc(100vh - 14px); /* leave room for scrollbar */
       width: auto;
       image-rendering: pixelated;
-    }
-
-    /* --- FOOTER SCROLLBAR ONLY --- */
-    .footer {
-      overflow-x: auto;
-      height: 14px;
-    }
-
-    .footer .tile-scroll {
-      height: 14px;
-    }
-
-    /* Shared */
-    .tile {
       margin: 0;
       padding: 0;
     }
@@ -98,33 +82,43 @@
 </head>
 <body>
   <div class="layout">
-    <!-- HEADER (titles) -->
-    <div class="header">
-      <div class="tile-container">
-        <div class="tile"><div>100</div></div>
-        <div class="tile"><div>200</div></div>
-        <div class="tile"><div>300</div></div>
-        <!-- Add more titles -->
+    <!-- Main Viewport: titles + tiles -->
+    <div class="main" id="main">
+      <div class="tiles-wrapper" id="tiles">
+        <div class="tile">
+          <div>100</div>
+          <img src="./tiles/pi_000001-000100.png" />
+        </div>
+        <div class="tile">
+          <div>200</div>
+          <img src="./tiles/pi_000101-000200.png" />
+        </div>
+        <div class="tile">
+          <div>300</div>
+          <img src="./tiles/pi_000201-000300.png" />
+        </div>
+        <!-- Add more tiles -->
       </div>
     </div>
 
-    <!-- MAIN (images) -->
-    <div class="main">
-      <div class="tile-container">
-        <div class="tile"><img src="./tiles/pi_000001-000100.png" /></div>
-        <div class="tile"><img src="./tiles/pi_000101-000200.png" /></div>
-        <div class="tile"><img src="./tiles/pi_000201-000300.png" /></div>
-        <!-- Add more images -->
-      </div>
-    </div>
-
-    <!-- FOOTER (scrollbar only) -->
-    <div class="footer">
-      <div class="tile-container">
-        <div class="tile" style="width: 1800px;"></div>
-        <!-- You can match the total pixel width here to enable scrollbar -->
-      </div>
+    <!-- Scrollbar Section -->
+    <div class="scrollbar" id="scrollbar">
+      <div style="width: 1800px; height: 1px;"></div>
     </div>
   </div>
+
+  <!-- Optional: Sync scrollbar and tiles scroll -->
+  <script>
+    const scrollbar = document.getElementById('scrollbar');
+    const main = document.getElementById('main');
+
+    scrollbar.addEventListener('scroll', () => {
+      main.scrollLeft = scrollbar.scrollLeft;
+    });
+
+    main.addEventListener('scroll', () => {
+      scrollbar.scrollLeft = main.scrollLeft;
+    });
+  </script>
 </body>
 </html>
