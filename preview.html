@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pi Digit Tiles Preview</title>
+  <style>
+    body {
+      font-family: monospace;
+      background-color: #111;
+      color: #eee;
+      padding: 20px;
+    }
+    .tile-container {
+      display: flex;
+      overflow-x: auto;
+      gap: 10px;
+      padding: 20px 0;
+    }
+    .tile {
+      text-align: center;
+      font-size: 12px;
+    }
+    .tile img {
+      display: block;
+      image-rendering: pixelated;
+      margin-top: 5px;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>Pi Digit Tiles Preview</h1>
+  <div class="tile-container">
+    <!-- Start Tiles -->
+    <!-- You can generate 10,000 tiles in Python -->
+    <!-- Sample of 10 tiles: -->
+    <div class="tile">
+      <div>000001–000100</div>
+      <img src="https://ludgar.github.io/pi-overlay/tiles/pi_000001-000100.png" width="600" />
+    </div>
+    <div class="tile">
+      <div>000101–000200</div>
+      <img src="https://ludgar.github.io/pi-overlay/tiles/pi_000101-000200.png" width="600" />
+    </div>
+    <div class="tile">
+      <div>000201–000300</div>
+      <img src="https://ludgar.github.io/pi-overlay/tiles/pi_000201-000300.png" width="600" />
+    </div>
+    <!-- Add more here -->
+  </div>
+</body>
+</html>
