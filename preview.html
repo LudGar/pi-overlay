@@ -12,14 +12,15 @@
       font-family: monospace;
       overflow-x: auto;
       overflow-y: hidden;
+      height: 100vh;
     }
 
     .tile-container {
       display: flex;
       flex-direction: row;
-      gap: 0;
       height: 100vh;
       align-items: flex-start;
+      white-space: nowrap;
     }
 
     .tile {
@@ -27,7 +28,6 @@
       padding: 0;
       margin: 0;
       color: white;
-      white-space: nowrap;
     }
 
     .tile img {
@@ -48,7 +48,6 @@
 </head>
 <body>
   <div class="tile-container">
-    <!-- Sample Tiles -->
     <div class="tile">
       <div>000001–000100</div>
       <img src="https://ludgar.github.io/pi-overlay/tiles/pi_000001-000100.png" />
@@ -61,7 +60,7 @@
       <div>000201–000300</div>
       <img src="https://ludgar.github.io/pi-overlay/tiles/pi_000201-000300.png" />
     </div>
-    <!-- Repeat as needed -->
+    <!-- Add more tiles here as needed -->
   </div>
 </body>
 </html>
