@@ -4,49 +4,64 @@
   <meta charset="UTF-8" />
   <title>Pi Digit Tiles Preview</title>
   <style>
-    body {
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: #808080; /* 50% grey */
+      color: #fff;
       font-family: monospace;
-      background-color: #111;
-      color: #eee;
-      padding: 20px;
+      overflow-x: auto;
+      overflow-y: hidden;
     }
+
     .tile-container {
       display: flex;
-      overflow-x: auto;
-      gap: 10px;
-      padding: 20px 0;
+      flex-direction: row;
+      gap: 0;
+      height: 100vh;
+      align-items: flex-start;
     }
+
     .tile {
       text-align: center;
-      font-size: 12px;
+      padding: 0;
+      margin: 0;
+      color: white;
+      white-space: nowrap;
     }
+
     .tile img {
       display: block;
+      height: 100vh;
+      width: auto;
       image-rendering: pixelated;
-      margin-top: 5px;
-      height: auto;
+      margin: 0;
+      padding: 0;
+    }
+
+    .tile div {
+      font-size: 10px;
+      background-color: rgba(0, 0, 0, 0.5);
+      padding: 2px 4px;
     }
   </style>
 </head>
 <body>
-  <h1>Pi Digit Tiles Preview</h1>
   <div class="tile-container">
-    <!-- Start Tiles -->
-    <!-- You can generate 10,000 tiles in Python -->
-    <!-- Sample of 10 tiles: -->
+    <!-- Sample Tiles -->
     <div class="tile">
       <div>000001–000100</div>
-      <img src="https://ludgar.github.io/pi-overlay/tiles/pi_000001-000100.png" width="600" />
+      <img src="https://ludgar.github.io/pi-overlay/tiles/pi_000001-000100.png" />
     </div>
     <div class="tile">
       <div>000101–000200</div>
-      <img src="https://ludgar.github.io/pi-overlay/tiles/pi_000101-000200.png" width="600" />
+      <img src="https://ludgar.github.io/pi-overlay/tiles/pi_000101-000200.png" />
     </div>
     <div class="tile">
       <div>000201–000300</div>
-      <img src="https://ludgar.github.io/pi-overlay/tiles/pi_000201-000300.png" width="600" />
+      <img src="https://ludgar.github.io/pi-overlay/tiles/pi_000201-000300.png" />
     </div>
-    <!-- Add more here -->
+    <!-- Repeat as needed -->
   </div>
 </body>
 </html>
