@@ -1,8 +1,9 @@
 {
   "version": 1,
-  "name": "pi-overlay",
-  "imageUrl": "./tiles/pi_000001-000100.png",
+  "name": "100",
+  "imageUrl": "https://ludgar.github.io/pi-overlay/tiles/pi_000001-000100.png",
+  "pixelUrl": "https://backend.wplace.live/s0/pixel/1063/686?x=773&y=207",
   "offsetX": 0,
   "offsetY": 0,
-  "opacity": 0.5
+  "opacity": 0.7
 }
