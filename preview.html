@@ -10,12 +10,11 @@
       background-color: #808080; /* 50% grey */
       color: #fff;
       font-family: monospace;
-      overflow-x: auto;
-      overflow-y: hidden;
       height: 100vh;
+      overflow: hidden; /* disable global scrolling */
     }
 
-    /* Custom Scrollbar (WebKit browsers) */
+    /* Custom Scrollbar Styling */
     ::-webkit-scrollbar {
       height: 12px;
     }
@@ -27,19 +26,37 @@
       border-radius: 4px;
     }
 
-    /* Firefox Scrollbar */
+    /* Firefox */
     * {
       scrollbar-width: thin;
       scrollbar-color: #333 #808080;
     }
 
+    /* Outer Wrapper */
+    .scroll-wrapper {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      top: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Title & Tiles Row */
+    .tile-scroll {
+      flex-grow: 1;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+
     .tile-container {
       display: flex;
       flex-direction: row;
-      height: 100vh;
       align-items: flex-start;
       white-space: nowrap;
-      margin-bottom: 10px; /* space above the scrollbar */
+      height: 100%;
+      margin-bottom: 0; /* No overlap with scroll anymore */
     }
 
     .tile {
@@ -58,26 +75,30 @@
 
     .tile div {
       font-size: 10px;
-      background-color: rgba(0, 0, 0, 0.5);
+      background-color: #808080;
       padding: 2px 4px;
     }
   </style>
 </head>
 <body>
-  <div class="tile-container">
-    <div class="tile">
-      <div>100</div>
-      <img src="./tiles/pi_000001-000100.png" />
+  <div class="scroll-wrapper">
+    <div class="tile-scroll">
+      <div class="tile-container">
+        <div class="tile">
+          <div>100</div>
+          <img src="./tiles/pi_000001-000100.png" />
+        </div>
+        <div class="tile">
+          <div>200</div>
+          <img src="./tiles/pi_000101-000200.png" />
+        </div>
+        <div class="tile">
+          <div>300</div>
+          <img src="./tiles/pi_000201-000300.png" />
+        </div>
+        <!-- Add more tiles as needed -->
+      </div>
     </div>
-    <div class="tile">
-      <div>200</div>
-      <img src="./tiles/pi_000101-000200.png" />
-    </div>
-    <div class="tile">
-      <div>300</div>
-      <img src="./tiles/pi_000201-000300.png" />
-    </div>
-    <!-- Add more tiles here -->
   </div>
 </body>
 </html>
