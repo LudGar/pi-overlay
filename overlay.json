@@ -1,0 +1,27 @@
+{
+  "name": "Pi Overlay 1M Digits",
+  "overlays": [
+    {
+      "name": "Tile 000001–000100",
+      "src": "https://ludgar.github.io/pi-overlay/tiles/pi_000001-000100.png",
+      "x": 0,
+      "y": 0,
+      "opacity": 1.0
+    },
+    {
+      "name": "Tile 000101–000200",
+      "src": "https://ludgar.github.io/pi-overlay/tiles/pi_000101-000200.png",
+      "x": 600,
+      "y": 0,
+      "opacity": 1.0
+    },
+    {
+      "name": "Tile 000201–000300",
+      "src": "https://ludgar.github.io/pi-overlay/tiles/pi_000201-000300.png",
+      "x": 1200,
+      "y": 0,
+      "opacity": 1.0
+    }
+    // Add more tiles as needed...
+  ]
+}
