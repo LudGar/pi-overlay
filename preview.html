@@ -31,7 +31,7 @@
       scrollbar-color: #333 #808080;
     }
 
-    /* Layout Structure */
+    /* Layout */
     .layout {
       display: flex;
       flex-direction: column;
@@ -41,6 +41,7 @@
     .main {
       flex-grow: 1;
       overflow: hidden;
+      position: relative;
     }
 
     .scrollbar {
@@ -55,35 +56,66 @@
       align-items: flex-start;
       white-space: nowrap;
       height: 100%;
+      transform-origin: top left;
     }
 
     .tile {
       text-align: right;
       color: white;
-      margin: 0;
-      padding: 0;
     }
 
     .tile div {
       font-size: 10px;
-      background-color: #808080;
+      background-color: rgba(0, 0, 0, 0.5);
       padding: 2px 4px;
     }
 
     .tile img {
       display: block;
-      height: calc(100vh - 14px); /* leave room for scrollbar */
+      height: auto;
       width: auto;
       image-rendering: pixelated;
       margin: 0;
       padding: 0;
     }
+
+    /* Zoom Controls */
+    .zoom-controls {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      z-index: 999;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 6px 10px;
+      border-radius: 4px;
+      user-select: none;
+    }
+
+    .zoom-controls button {
+      font-size: 14px;
+      margin: 0 4px;
+      background: #222;
+      color: #fff;
+      border: none;
+      padding: 4px 8px;
+      cursor: pointer;
+    }
+
+    .zoom-level {
+      font-size: 12px;
+      margin-left: 8px;
+    }
   </style>
 </head>
 <body>
   <div class="layout">
-    <!-- Main Viewport: titles + tiles -->
+    <!-- MAIN AREA -->
     <div class="main" id="main">
+      <div class="zoom-controls">
+        <button onclick="changeZoom(-1)">–</button>
+        <button onclick="changeZoom(1)">+</button>
+        <span class="zoom-level" id="zoom-level">x1</span>
+      </div>
       <div class="tiles-wrapper" id="tiles">
         <div class="tile">
           <div>100</div>
@@ -97,21 +129,32 @@
           <div>300</div>
           <img src="./tiles/pi_000201-000300.png" />
         </div>
-        <!-- Add more tiles -->
+        <!-- Add more tiles here -->
       </div>
     </div>
 
-    <!-- Scrollbar Section -->
+    <!-- SCROLLBAR BELOW -->
     <div class="scrollbar" id="scrollbar">
       <div style="width: 1800px; height: 1px;"></div>
     </div>
   </div>
 
-  <!-- Optional: Sync scrollbar and tiles scroll -->
   <script>
     const scrollbar = document.getElementById('scrollbar');
     const main = document.getElementById('main');
+    const tiles = document.getElementById('tiles');
+    const zoomLevelText = document.getElementById('zoom-level');
 
+    let zoom = 1;
+
+    function changeZoom(direction) {
+      zoom += direction;
+      if (zoom < 1) zoom = 1;
+      tiles.style.transform = `scale(${zoom})`;
+      zoomLevelText.textContent = `x${zoom}`;
+    }
+
+    // Sync scroll between top tiles and bottom bar
     scrollbar.addEventListener('scroll', () => {
       main.scrollLeft = scrollbar.scrollLeft;
     });
