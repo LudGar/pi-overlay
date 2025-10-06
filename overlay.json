@@ -1,27 +1,8 @@
 {
-  "name": "Pi Overlay 1M Digits",
-  "overlays": [
-    {
-      "name": "Tile 000001–000100",
-      "src": "/tiles/pi_000001-000100.png",
-      "x": 0,
-      "y": 0,
-      "opacity": 1.0
-    },
-    {
-      "name": "Tile 000101–000200",
-      "src": "/tiles/pi_000101-000200.png",
-      "x": 600,
-      "y": 0,
-      "opacity": 1.0
-    },
-    {
-      "name": "Tile 000201–000300",
-      "src": "/tiles/pi_000201-000300.png",
-      "x": 1200,
-      "y": 0,
-      "opacity": 1.0
-    }
-    // Add more tiles as needed...
-  ]
+  "version": 1,
+  "name": "pi-overlay",
+  "imageUrl": "./tiles/pi_000001-000100.png",
+  "offsetX": 0,
+  "offsetY": 0,
+  "opacity": 0.5
 }
