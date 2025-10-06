@@ -6,29 +6,44 @@
   <style>
     html, body {
       margin: 0; padding: 0;
-      background: #808080; /* 50% grey */
-      color: #fff; font-family: monospace;
-      height: 100vh; overflow: hidden; /* no global bars */
+      background: #808080; color: #fff;
+      font-family: monospace;
+      height: 100vh; overflow: hidden;
     }
-
-    /* Hide MAIN scrollbar, we'll use the footer proxy */
-    .main {
-      flex: 1 1 auto;
-      overflow-x: auto;   /* allow programmatic scroll */
-      overflow-y: hidden;
-      scrollbar-width: none;        /* Firefox hide */
-      -ms-overflow-style: none;     /* IE/Edge legacy */
-      position: relative;
-    }
-    .main::-webkit-scrollbar { display: none; } /* WebKit hide */
 
     .layout { display: flex; flex-direction: column; height: 100vh; }
 
-    /* Zoom controls */
+    .main { flex: 1 1 auto; overflow: hidden; position: relative; }
+    .tiles-wrapper {
+      display: flex; flex-direction: row; white-space: nowrap;
+      align-items: flex-start; height: 100%;
+    }
+
+    .tile { text-align: right; color: white; }
+    .tile div {
+      font-size: 10px;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 2px 4px;
+    }
+    .tile img {
+      display: block;
+      width: auto;
+      height: 100%;
+      image-rendering: pixelated;
+      margin: 0; padding: 0;
+    }
+
+    .scrollbar {
+      height: 14px;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+
+    .scrollbar-inner { height: 1px; }
+
     .zoom-controls {
       position: absolute; top: 8px; left: 8px; z-index: 10;
-      background: rgba(0,0,0,0.4); border-radius: 4px;
-      padding: 6px 10px; user-select: none;
+      background: rgba(0, 0, 0, 0.4); padding: 6px 10px; border-radius: 4px;
     }
     .zoom-controls button {
       font-size: 14px; margin: 0 4px; background: #222; color: #fff;
@@ -36,35 +51,14 @@
     }
     .zoom-level { font-size: 12px; margin-left: 8px; }
 
-    /* Tiles row */
-    .tiles-wrapper {
-      display: flex; align-items: flex-start; white-space: nowrap;
-      height: 100%; /* base reference for img height */
-      padding-top: 0; padding-bottom: 0;
-    }
-    .tile { text-align: right; color: #fff; }
-    .tile div {
-      font-size: 10px; background: rgba(0,0,0,0.5); padding: 2px 4px;
-    }
-    .tile img {
-      display: block;
-      height: 100%;            /* at zoom x1 we set to main height via JS */
-      width: auto;
-      image-rendering: pixelated;
-      margin: 0; padding: 0;
-    }
+    ::-webkit-scrollbar { height: 12px; }
+    ::-webkit-scrollbar-track { background: #808080; }
+    ::-webkit-scrollbar-thumb { background-color: #333; border-radius: 4px; }
 
-    /* Footer proxy scrollbar */
-    .scrollbar {
-      height: 14px;
-      overflow-x: auto; overflow-y: hidden;
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: #333 #808080;
     }
-    .scrollbar::-webkit-scrollbar { height: 12px; }
-    .scrollbar::-webkit-scrollbar-track { background: #808080; }
-    .scrollbar::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-    .scrollbar { scrollbar-width: thin; scrollbar-color: #333 #808080; }
-
-    .scrollbar-inner { height: 1px; } /* acts as width proxy */
   </style>
 </head>
 <body>
@@ -75,114 +69,97 @@
         <button id="zoomIn">+</button>
         <span class="zoom-level" id="zoomLevel">x1</span>
       </div>
-
       <div class="tiles-wrapper" id="tiles">
-        <!-- SAMPLE TILES — duplicate as needed -->
-        <div class="tile">
-          <div>100</div>
-          <img src="./tiles/pi_000001-000100.png" />
-        </div>
-        <div class="tile">
-          <div>200</div>
-          <img src="./tiles/pi_000101-000200.png" />
-        </div>
-        <div class="tile">
-          <div>300</div>
-          <img src="./tiles/pi_000201-000300.png" />
-        </div>
-        <!-- add more tiles here -->
+        <!-- JS will inject tiles here -->
       </div>
     </div>
-
-    <!-- Separate, visible scrollbar -->
     <div class="scrollbar" id="scrollbar">
       <div class="scrollbar-inner" id="scrollbarInner"></div>
     </div>
   </div>
 
   <script>
-    const main = document.getElementById('main');
-    const tiles = document.getElementById('tiles');
-    const scrollbar = document.getElementById('scrollbar');
-    const scrollbarInner = document.getElementById('scrollbarInner');
-    const zoomLevelText = document.getElementById('zoomLevel');
-    const zoomInBtn = document.getElementById('zoomIn');
-    const zoomOutBtn = document.getElementById('zoomOut');
+    const tilesEl = document.getElementById("tiles");
+    const scrollbar = document.getElementById("scrollbar");
+    const scrollbarInner = document.getElementById("scrollbarInner");
+    const main = document.getElementById("main");
+    const zoomLevelText = document.getElementById("zoomLevel");
 
-    let zoom = 1; // x1, x2, x3, ...
+    let zoom = 1;
 
     function applyZoom() {
-      // Base visible height for x1 = main client height
       const baseH = main.clientHeight;
-
-      // Set each image’s height to baseH * zoom (width scales automatically)
-      tiles.querySelectorAll('img').forEach(img => {
-        img.style.height = (baseH * zoom) + 'px';
+      tilesEl.querySelectorAll("img").forEach(img => {
+        img.style.height = (baseH * zoom) + "px";
       });
-
-      // Update proxy width so scrollbar reflects new total width
-      // Use scrollWidth AFTER images resized so it's accurate
       requestAnimationFrame(() => {
-        scrollbarInner.style.width = tiles.scrollWidth + 'px';
+        scrollbarInner.style.width = tilesEl.scrollWidth + "px";
       });
-
       zoomLevelText.textContent = `x${zoom}`;
     }
 
     function changeZoom(dir) {
       const prevZoom = zoom;
-      zoom = Math.max(1, zoom + dir); // clamp to x1 minimum
+      zoom = Math.max(1, zoom + dir);
       if (zoom === prevZoom) return;
 
-      // Preserve relative scroll position while zooming
-      const maxMainScroll = Math.max(1, tiles.scrollWidth - main.clientWidth);
-      const ratio = maxMainScroll > 0 ? (main.scrollLeft / maxMainScroll) : 0;
+      const maxScroll = Math.max(1, tilesEl.scrollWidth - main.clientWidth);
+      const ratio = main.scrollLeft / maxScroll;
 
       applyZoom();
 
-      // After layout updates, restore proportional scroll
       requestAnimationFrame(() => {
-        const newMaxMain = Math.max(1, tiles.scrollWidth - main.clientWidth);
-        main.scrollLeft = ratio * newMaxMain;
-        scrollbar.scrollLeft = main.scrollLeft; // sync proxy
+        const newMax = Math.max(1, tilesEl.scrollWidth - main.clientWidth);
+        main.scrollLeft = ratio * newMax;
+        scrollbar.scrollLeft = main.scrollLeft;
       });
     }
 
-    // Sync scrolling between main (hidden bar) and the visible footer bar
-    scrollbar.addEventListener('scroll', () => {
-      main.scrollLeft = scrollbar.scrollLeft;
-    });
-    main.addEventListener('scroll', () => {
-      scrollbar.scrollLeft = main.scrollLeft;
-    });
+    document.getElementById("zoomIn").addEventListener("click", () => changeZoom(1));
+    document.getElementById("zoomOut").addEventListener("click", () => changeZoom(-1));
+    scrollbar.addEventListener("scroll", () => main.scrollLeft = scrollbar.scrollLeft);
+    main.addEventListener("scroll", () => scrollbar.scrollLeft = main.scrollLeft);
 
-    // Hook up buttons
-    zoomInBtn.addEventListener('click', () => changeZoom(1));
-    zoomOutBtn.addEventListener('click', () => changeZoom(-1));
+    // Load tiles.json
+    fetch("./tiles/tiles.json")
+      .then(res => res.json())
+      .then(tiles => {
+        tiles.forEach((filename, index) => {
+          const step = (index + 1) * 100;
+          const tile = document.createElement("div");
+          tile.className = "tile";
 
-    // Recompute on resize (window / orientation)
-    window.addEventListener('resize', applyZoom);
+          const title = document.createElement("div");
+          title.textContent = step;
 
-    // Recompute after images load (first-time)
-    const imgs = Array.from(tiles.querySelectorAll('img'));
-    let loaded = 0;
-    imgs.forEach(img => {
-      if (img.complete) {
-        loaded++;
-        if (loaded === imgs.length) applyZoom();
-      } else {
-        img.addEventListener('load', () => {
-          loaded++;
-          if (loaded === imgs.length) applyZoom();
+          const img = document.createElement("img");
+          img.src = `./tiles/${filename}`;
+
+          tile.appendChild(title);
+          tile.appendChild(img);
+          tilesEl.appendChild(tile);
         });
-        img.addEventListener('error', () => {
-          loaded++;
-          if (loaded === imgs.length) applyZoom();
+
+        // Once loaded, zoom
+        const imgs = tilesEl.querySelectorAll("img");
+        let loaded = 0;
+        imgs.forEach(img => {
+          if (img.complete) {
+            loaded++;
+            if (loaded === imgs.length) applyZoom();
+          } else {
+            img.addEventListener("load", () => {
+              loaded++;
+              if (loaded === imgs.length) applyZoom();
+            });
+          }
         });
-      }
-    });
-    // Fallback if no images or already cached
-    if (imgs.length === 0) applyZoom();
+        if (imgs.length === 0) applyZoom();
+      })
+      .catch(err => {
+        console.error("tiles.json load failed:", err);
+        tilesEl.innerHTML = `<div style="padding:1rem;">⚠️ Could not load tiles.json</div>`;
+      });
   </script>
 </body>
 </html>
