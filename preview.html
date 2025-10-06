@@ -7,14 +7,14 @@
     html, body {
       margin: 0;
       padding: 0;
-      background-color: #808080; /* 50% grey */
+      background-color: #808080;
       color: #fff;
       font-family: monospace;
       height: 100vh;
-      overflow: hidden; /* disable global scrolling */
+      overflow: hidden;
     }
 
-    /* Custom Scrollbar Styling */
+    /* Scrollbar styling (WebKit) */
     ::-webkit-scrollbar {
       height: 12px;
     }
@@ -26,77 +26,103 @@
       border-radius: 4px;
     }
 
-    /* Firefox */
+    /* Firefox scrollbar */
     * {
       scrollbar-width: thin;
       scrollbar-color: #333 #808080;
     }
 
-    /* Outer Wrapper */
-    .scroll-wrapper {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      top: 0;
-      display: flex;
-      flex-direction: column;
+    /* Layout Sections */
+    .layout {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      height: 100vh;
     }
 
-    /* Title & Tiles Row */
-    .tile-scroll {
-      flex-grow: 1;
-      overflow-x: auto;
-      overflow-y: hidden;
+    .header, .main, .footer {
+      overflow: hidden;
     }
 
-    .tile-container {
+    .header .tile-container,
+    .main .tile-container,
+    .footer .tile-container {
       display: flex;
       flex-direction: row;
-      align-items: flex-start;
       white-space: nowrap;
-      height: 100%;
-      margin-bottom: 0; /* No overlap with scroll anymore */
     }
 
-    .tile {
+    /* --- HEADER --- */
+    .header .tile {
       text-align: right;
-      color: white;
     }
 
-    .tile img {
-      display: block;
-      height: 100vh;
-      width: auto;
-      image-rendering: pixelated;
-      margin: 0;
-      padding: 0;
-    }
-
-    .tile div {
+    .header .tile div {
       font-size: 10px;
       background-color: #808080;
       padding: 2px 4px;
+      height: 100%;
+    }
+
+    /* --- MAIN --- */
+    .main {
+      overflow: hidden;
+    }
+
+    .main .tile-scroll {
+      overflow-x: hidden;
+    }
+
+    .main .tile img {
+      display: block;
+      height: 100%;
+      width: auto;
+      image-rendering: pixelated;
+    }
+
+    /* --- FOOTER SCROLLBAR ONLY --- */
+    .footer {
+      overflow-x: auto;
+      height: 14px;
+    }
+
+    .footer .tile-scroll {
+      height: 14px;
+    }
+
+    /* Shared */
+    .tile {
+      margin: 0;
+      padding: 0;
     }
   </style>
 </head>
 <body>
-  <div class="scroll-wrapper">
-    <div class="tile-scroll">
+  <div class="layout">
+    <!-- HEADER (titles) -->
+    <div class="header">
       <div class="tile-container">
-        <div class="tile">
-          <div>100</div>
-          <img src="./tiles/pi_000001-000100.png" />
-        </div>
-        <div class="tile">
-          <div>200</div>
-          <img src="./tiles/pi_000101-000200.png" />
-        </div>
-        <div class="tile">
-          <div>300</div>
-          <img src="./tiles/pi_000201-000300.png" />
-        </div>
-        <!-- Add more tiles as needed -->
+        <div class="tile"><div>100</div></div>
+        <div class="tile"><div>200</div></div>
+        <div class="tile"><div>300</div></div>
+        <!-- Add more titles -->
+      </div>
+    </div>
+
+    <!-- MAIN (images) -->
+    <div class="main">
+      <div class="tile-container">
+        <div class="tile"><img src="./tiles/pi_000001-000100.png" /></div>
+        <div class="tile"><img src="./tiles/pi_000101-000200.png" /></div>
+        <div class="tile"><img src="./tiles/pi_000201-000300.png" /></div>
+        <!-- Add more images -->
+      </div>
+    </div>
+
+    <!-- FOOTER (scrollbar only) -->
+    <div class="footer">
+      <div class="tile-container">
+        <div class="tile" style="width: 1800px;"></div>
+        <!-- You can match the total pixel width here to enable scrollbar -->
       </div>
     </div>
   </div>
