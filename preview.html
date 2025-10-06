@@ -8,71 +8,78 @@
       margin: 0; padding: 0;
       background: #808080; color: #fff;
       font-family: monospace;
-      height: 100vh; overflow: hidden;
+      height: 100vh; overflow: hidden; /* no global bars */
     }
 
     .layout { display: flex; flex-direction: column; height: 100vh; }
 
-    .main { flex: 1 1 auto; overflow: hidden; position: relative; }
-    .tiles-wrapper {
-      display: flex; flex-direction: row; white-space: nowrap;
-      align-items: flex-start; height: 100%;
+    /* MAIN area (hidden scrollbar; we use footer scrollbar) */
+    .main {
+      flex: 1 1 auto;
+      overflow-x: auto;   /* programmatic sync */
+      overflow-y: hidden;
+      scrollbar-width: none;        /* Firefox hide */
+      -ms-overflow-style: none;     /* IE/Edge legacy */
+      position: relative;
     }
+    .main::-webkit-scrollbar { display: none; } /* WebKit hide */
 
-    .tile { text-align: right; color: white; }
+    /* Tiles row */
+    .tiles-wrapper {
+      display: flex; align-items: flex-start; white-space: nowrap;
+      height: 100%; position: relative; /* so zoom-controls scroll with content */
+    }
+    .tile { text-align: right; color: #fff; }
     .tile div {
-      font-size: 10px;
-      background: rgba(0, 0, 0, 0.5);
-      padding: 2px 4px;
+      font-size: 10px; background: rgba(0,0,0,0.5); padding: 2px 4px;
     }
     .tile img {
       display: block;
-      width: auto;
-      height: 100%;
+      width: auto;           /* width scales from natural aspect ratio */
+      height: auto;          /* set in JS to naturalHeight * zoom */
       image-rendering: pixelated;
       margin: 0; padding: 0;
     }
 
+    /* Footer proxy scrollbar (visible) */
     .scrollbar {
       height: 14px;
-      overflow-x: auto;
-      overflow-y: hidden;
+      overflow-x: auto; overflow-y: hidden;
     }
+    .scrollbar::-webkit-scrollbar { height: 12px; }
+    .scrollbar::-webkit-scrollbar-track { background: #808080; }
+    .scrollbar::-webkit-scrollbar-thumb { background-color: #333; border-radius: 4px; }
+    .scrollbar { scrollbar-width: thin; scrollbar-color: #333 #808080; }
+    .scrollbar-inner { height: 1px; } /* width is set in JS */
 
-    .scrollbar-inner { height: 1px; }
-
+    /* Zoom Controls (inside scrollable content so they move with it) */
     .zoom-controls {
       position: absolute; top: 8px; left: 8px; z-index: 10;
-      background: rgba(0, 0, 0, 0.4); padding: 6px 10px; border-radius: 4px;
+      background: rgba(0,0,0,0.4); border-radius: 4px;
+      padding: 6px 10px; user-select: none;
     }
     .zoom-controls button {
       font-size: 14px; margin: 0 4px; background: #222; color: #fff;
       border: none; padding: 4px 8px; cursor: pointer;
     }
     .zoom-level { font-size: 12px; margin-left: 8px; }
-
-    ::-webkit-scrollbar { height: 12px; }
-    ::-webkit-scrollbar-track { background: #808080; }
-    ::-webkit-scrollbar-thumb { background-color: #333; border-radius: 4px; }
-
-    * {
-      scrollbar-width: thin;
-      scrollbar-color: #333 #808080;
-    }
   </style>
 </head>
 <body>
   <div class="layout">
     <div class="main" id="main">
-      <div class="zoom-controls">
-        <button id="zoomOut">–</button>
-        <button id="zoomIn">+</button>
-        <span class="zoom-level" id="zoomLevel">x1</span>
-      </div>
       <div class="tiles-wrapper" id="tiles">
-        <!-- JS will inject tiles here -->
+        <!-- Zoom controls live inside the scrolling content so they move with it -->
+        <div class="zoom-controls">
+          <button id="zoomOut">–</button>
+          <button id="zoomIn">+</button>
+          <span class="zoom-level" id="zoomLevel">x1</span>
+        </div>
+        <!-- JS injects tiles here -->
       </div>
     </div>
+
+    <!-- Separate, visible scrollbar -->
     <div class="scrollbar" id="scrollbar">
       <div class="scrollbar-inner" id="scrollbarInner"></div>
     </div>
@@ -80,52 +87,61 @@
 
   <script>
     const tilesEl = document.getElementById("tiles");
+    const main = document.getElementById("main");
     const scrollbar = document.getElementById("scrollbar");
     const scrollbarInner = document.getElementById("scrollbarInner");
-    const main = document.getElementById("main");
     const zoomLevelText = document.getElementById("zoomLevel");
+    const zoomInBtn = document.getElementById("zoomIn");
+    const zoomOutBtn = document.getElementById("zoomOut");
 
-    let zoom = 1;
+    let zoom = 1; // x1 = 100% (natural pixel size)
 
     function applyZoom() {
-      const baseH = main.clientHeight;
+      // Set each image height to its natural height * zoom (x1 = exact pixels)
       tilesEl.querySelectorAll("img").forEach(img => {
-        img.style.height = (baseH * zoom) + "px";
+        const nh = img.naturalHeight || 7; // fallback if not loaded yet
+        img.style.height = (nh * zoom) + "px";
       });
+
+      // After layout updates, update proxy width for footer scrollbar
       requestAnimationFrame(() => {
         scrollbarInner.style.width = tilesEl.scrollWidth + "px";
+        zoomLevelText.textContent = `x${zoom}`;
       });
-      zoomLevelText.textContent = `x${zoom}`;
     }
 
     function changeZoom(dir) {
       const prevZoom = zoom;
-      zoom = Math.max(1, zoom + dir);
+      zoom = Math.max(1, zoom + dir); // clamp min x1
       if (zoom === prevZoom) return;
 
-      const maxScroll = Math.max(1, tilesEl.scrollWidth - main.clientWidth);
-      const ratio = main.scrollLeft / maxScroll;
+      // Preserve relative horizontal position when zooming
+      const maxBefore = Math.max(1, tilesEl.scrollWidth - main.clientWidth);
+      const ratio = main.scrollLeft / maxBefore;
 
       applyZoom();
 
       requestAnimationFrame(() => {
-        const newMax = Math.max(1, tilesEl.scrollWidth - main.clientWidth);
-        main.scrollLeft = ratio * newMax;
-        scrollbar.scrollLeft = main.scrollLeft;
+        const maxAfter = Math.max(1, tilesEl.scrollWidth - main.clientWidth);
+        main.scrollLeft = ratio * maxAfter;
+        scrollbar.scrollLeft = main.scrollLeft; // sync proxy
       });
     }
 
-    document.getElementById("zoomIn").addEventListener("click", () => changeZoom(1));
-    document.getElementById("zoomOut").addEventListener("click", () => changeZoom(-1));
-    scrollbar.addEventListener("scroll", () => main.scrollLeft = scrollbar.scrollLeft);
-    main.addEventListener("scroll", () => scrollbar.scrollLeft = main.scrollLeft);
+    // Sync scrolling between the hidden main bar and visible footer bar
+    scrollbar.addEventListener("scroll", () => { main.scrollLeft = scrollbar.scrollLeft; });
+    main.addEventListener("scroll", () => { scrollbar.scrollLeft = main.scrollLeft; });
 
-    // Load tiles.json
+    zoomInBtn.addEventListener("click", () => changeZoom(1));
+    zoomOutBtn.addEventListener("click", () => changeZoom(-1));
+    window.addEventListener("resize", applyZoom);
+
+    // Load tiles list from tiles.json and render
     fetch("./tiles/tiles.json")
-      .then(res => res.json())
-      .then(tiles => {
-        tiles.forEach((filename, index) => {
-          const step = (index + 1) * 100;
+      .then(r => r.json())
+      .then(files => {
+        files.forEach((filename, idx) => {
+          const step = (idx + 1) * 100; // 100, 200, 300, ...
           const tile = document.createElement("div");
           tile.className = "tile";
 
@@ -140,8 +156,10 @@
           tilesEl.appendChild(tile);
         });
 
-        // Once loaded, zoom
-        const imgs = tilesEl.querySelectorAll("img");
+        // Apply initial zoom after images load (so naturalHeight is known)
+        const imgs = Array.from(tilesEl.querySelectorAll("img"));
+        if (imgs.length === 0) return applyZoom();
+
         let loaded = 0;
         imgs.forEach(img => {
           if (img.complete) {
@@ -152,13 +170,18 @@
               loaded++;
               if (loaded === imgs.length) applyZoom();
             });
+            img.addEventListener("error", () => {
+              loaded++;
+              if (loaded === imgs.length) applyZoom();
+            });
           }
         });
-        if (imgs.length === 0) applyZoom();
       })
       .catch(err => {
         console.error("tiles.json load failed:", err);
-        tilesEl.innerHTML = `<div style="padding:1rem;">⚠️ Could not load tiles.json</div>`;
+        tilesEl.insertAdjacentHTML("beforeend",
+          `<div style="padding:1rem;background:rgba(0,0,0,0.4)">⚠️ Could not load tiles.json</div>`);
+        applyZoom();
       });
   </script>
 </body>
