@@ -15,18 +15,35 @@
       height: 100vh;
     }
 
+    /* Custom Scrollbar (WebKit browsers) */
+    ::-webkit-scrollbar {
+      height: 12px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #808080;
+    }
+    ::-webkit-scrollbar-thumb {
+      background-color: #333;
+      border-radius: 4px;
+    }
+
+    /* Firefox Scrollbar */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: #333 #808080;
+    }
+
     .tile-container {
       display: flex;
       flex-direction: row;
       height: 100vh;
       align-items: flex-start;
       white-space: nowrap;
+      margin-bottom: 10px; /* space above the scrollbar */
     }
 
     .tile {
-      text-align: center;
-      padding: 0;
-      margin: 0;
+      text-align: right;
       color: white;
     }
 
@@ -49,18 +66,18 @@
 <body>
   <div class="tile-container">
     <div class="tile">
-      <div>000001–000100</div>
+      <div>100</div>
       <img src="./tiles/pi_000001-000100.png" />
     </div>
     <div class="tile">
-      <div>000101–000200</div>
+      <div>200</div>
       <img src="./tiles/pi_000101-000200.png" />
     </div>
     <div class="tile">
-      <div>000201–000300</div>
+      <div>300</div>
       <img src="./tiles/pi_000201-000300.png" />
     </div>
-    <!-- Add more tiles here as needed -->
+    <!-- Add more tiles here -->
   </div>
 </body>
 </html>
